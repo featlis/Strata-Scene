@@ -25,6 +25,7 @@ public sealed class AppController : IDisposable
     private readonly SceneManager _sceneManager;
     private readonly TaskbarTracker _taskbarTracker;
     private readonly ForegroundTracker _foregroundTracker;
+    private readonly FullscreenDetector _fullscreenDetector;
     private readonly HudManager _hudManager;
     private readonly TrayController _trayController;
 
@@ -36,6 +37,7 @@ public sealed class AppController : IDisposable
     public HotkeyService HotkeyService => _hotkeyService;
     public TrayController TrayController => _trayController;
     public HudManager HudManager => _hudManager;
+    public FullscreenDetector FullscreenDetector => _fullscreenDetector;
 
     public AppController(ILog log, Action onExit)
     {
@@ -53,7 +55,10 @@ public sealed class AppController : IDisposable
 
         _taskbarTracker = new TaskbarTracker(_log);
         _foregroundTracker = new ForegroundTracker(_log);
+        _fullscreenDetector = new FullscreenDetector(_log, _foregroundTracker);
         _hudManager = new HudManager(_log, _taskbarTracker, _foregroundTracker, _sceneManager, _config, OpenLauncher);
+
+        _fullscreenDetector.FullscreenChanged += (isFs, mon) => _hudManager.SetFullscreenHidden(isFs, mon);
 
         _trayController = new TrayController(_log, onExit);
         SetupTray();
@@ -226,6 +231,7 @@ public sealed class AppController : IDisposable
     public void Dispose()
     {
         _hotkeyService.Dispose();
+        _fullscreenDetector.Dispose();
         _hudManager.Dispose();
         _foregroundTracker.Dispose();
         _taskbarTracker.Dispose();
