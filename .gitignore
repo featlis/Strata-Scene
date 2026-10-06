@@ -1,0 +1,18 @@
+StrataScene_Specification.md
+IMPLEMENTATION_PLAN.md
+
+# Visual Studio / .NET build artifacts
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+_ReSharper*/
+*.DotSettings.user
+artifacts/
+TestResults/
+*.DotSettings
