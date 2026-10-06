@@ -24,3 +24,6 @@ GetWindowTextLength
 GetWindowThreadProcessId
 GetWindowLong
 SetWindowLong
+DwmGetWindowAttribute
+IsWindowVisible
+GetWindow
