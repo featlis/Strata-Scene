@@ -27,3 +27,5 @@ SetWindowLong
 DwmGetWindowAttribute
 IsWindowVisible
 GetWindow
+EnumDisplayMonitors
+GetClassName

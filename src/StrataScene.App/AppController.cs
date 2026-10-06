@@ -1,4 +1,5 @@
 using System.Windows;
+using StrataScene.App.Hud;
 using StrataScene.App.Tray;
 using StrataScene.Core.Config;
 using StrataScene.Core.Hotkeys;
@@ -22,6 +23,9 @@ public sealed class AppController : IDisposable
     private readonly HotkeyService _hotkeyService;
     private readonly SceneHost _sceneHost;
     private readonly SceneManager _sceneManager;
+    private readonly TaskbarTracker _taskbarTracker;
+    private readonly ForegroundTracker _foregroundTracker;
+    private readonly HudManager _hudManager;
     private readonly TrayController _trayController;
 
     private AppConfig _config;
@@ -31,6 +35,7 @@ public sealed class AppController : IDisposable
     public SceneManager SceneManager => _sceneManager;
     public HotkeyService HotkeyService => _hotkeyService;
     public TrayController TrayController => _trayController;
+    public HudManager HudManager => _hudManager;
 
     public AppController(ILog log, Action onExit)
     {
@@ -45,6 +50,10 @@ public sealed class AppController : IDisposable
         _hotkeyService = new HotkeyService(_log);
         _sceneHost = new SceneHost(_log);
         _sceneManager = new SceneManager(_log, _sceneHost);
+
+        _taskbarTracker = new TaskbarTracker(_log);
+        _foregroundTracker = new ForegroundTracker(_log);
+        _hudManager = new HudManager(_log, _taskbarTracker, _foregroundTracker, _sceneManager, _config, OpenLauncher);
 
         _trayController = new TrayController(_log, onExit);
         SetupTray();
@@ -217,6 +226,9 @@ public sealed class AppController : IDisposable
     public void Dispose()
     {
         _hotkeyService.Dispose();
+        _hudManager.Dispose();
+        _foregroundTracker.Dispose();
+        _taskbarTracker.Dispose();
         _stateRepository.Dispose();
         _trayController.Dispose();
     }
