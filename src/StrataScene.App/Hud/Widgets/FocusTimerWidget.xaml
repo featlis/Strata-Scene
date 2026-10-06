@@ -1,4 +1,4 @@
-<local:HudWidgetBase x:Class="StrataScene.App.Hud.Widgets.CurrentModeWidget"
+<local:HudWidgetBase x:Class="StrataScene.App.Hud.Widgets.FocusTimerWidget"
               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:local="clr-namespace:StrataScene.App.Hud"
@@ -10,7 +10,8 @@
             BorderThickness="1"
             CornerRadius="14"
             Cursor="Hand"
-            MouseLeftButtonUp="OnMouseLeftButtonUp">
+            MouseLeftButtonUp="OnMouseLeftButtonUp"
+            MouseRightButtonUp="OnMouseRightButtonUp">
         <Border.Style>
             <Style TargetType="Border">
                 <Style.Triggers>
@@ -27,20 +28,23 @@
                 <ColumnDefinition Width="6" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Ellipse x:Name="ModeIndicator"
+
+            <!-- Status Indicator (Tomato for work, Green for break) -->
+            <Ellipse x:Name="TimerIndicator"
                      Grid.Column="0"
                      Width="8" Height="8"
-                     Fill="#0078D4"
+                     Fill="#E81123"
                      VerticalAlignment="Center" />
-            <TextBlock x:Name="ModeNameText"
+
+            <!-- Time Display -->
+            <TextBlock x:Name="TimeText"
                        Grid.Column="2"
-                       Text="Work"
+                       Text="25:00"
                        Foreground="#FFFFFF"
                        FontSize="11"
                        FontWeight="SemiBold"
-                       FontFamily="Segoe UI Variable, Segoe UI, sans-serif"
-                       VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis" />
+                       FontFamily="Segoe UI Variable, Segoe UI, Consolas, sans-serif"
+                       VerticalAlignment="Center" />
         </Grid>
     </Border>
 </local:HudWidgetBase>

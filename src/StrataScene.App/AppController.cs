@@ -1,5 +1,7 @@
 using System.Windows;
 using StrataScene.App.Hud;
+using StrataScene.App.Launcher;
+using StrataScene.App.Settings;
 using StrataScene.App.Tray;
 using StrataScene.Core.Config;
 using StrataScene.Core.Hotkeys;
@@ -18,6 +20,7 @@ public sealed class AppController : IDisposable
     private const int HotkeyIdSceneBase = 100;
 
     private readonly ILog _log;
+    private readonly Action _onExit;
     private readonly ConfigRepository _configRepository;
     private readonly StateRepository _stateRepository;
     private readonly HotkeyService _hotkeyService;
@@ -28,7 +31,9 @@ public sealed class AppController : IDisposable
     private readonly FullscreenDetector _fullscreenDetector;
     private readonly HudManager _hudManager;
     private readonly TrayController _trayController;
+    private readonly LauncherWindow _launcherWindow;
 
+    private SettingsWindow? _settingsWindow;
     private AppConfig _config;
     private bool _isEditMode;
 
@@ -38,10 +43,12 @@ public sealed class AppController : IDisposable
     public TrayController TrayController => _trayController;
     public HudManager HudManager => _hudManager;
     public FullscreenDetector FullscreenDetector => _fullscreenDetector;
+    public LauncherWindow LauncherWindow => _launcherWindow;
 
     public AppController(ILog log, Action onExit)
     {
         _log = log;
+        _onExit = onExit;
 
         _configRepository = new ConfigRepository(_log);
         _stateRepository = new StateRepository(_log);
@@ -56,12 +63,44 @@ public sealed class AppController : IDisposable
         _taskbarTracker = new TaskbarTracker(_log);
         _foregroundTracker = new ForegroundTracker(_log);
         _fullscreenDetector = new FullscreenDetector(_log, _foregroundTracker);
-        _hudManager = new HudManager(_log, _taskbarTracker, _foregroundTracker, _sceneManager, _config, OpenLauncher);
-
-        _fullscreenDetector.FullscreenChanged += (isFs, mon) => _hudManager.SetFullscreenHidden(isFs, mon);
 
         _trayController = new TrayController(_log, onExit);
         SetupTray();
+
+        _hudManager = new HudManager(_log, _taskbarTracker, _foregroundTracker, _sceneManager, _config, OpenLauncher);
+        _hudManager.SetInitialScratchpadText(_stateRepository.CurrentState.ScratchpadText);
+
+        _hudManager.WidgetOffsetChanged = (widgetId, offsetX, offsetY) =>
+        {
+            var w = _config.Widgets.FirstOrDefault(x => x.Id == widgetId);
+            if (w != null)
+            {
+                w.OffsetX = offsetX;
+                w.OffsetY = offsetY;
+                _configRepository.Save(_config);
+            }
+        };
+
+        _hudManager.ScratchpadTextChanged = text =>
+        {
+            _stateRepository.Update(s => s.ScratchpadText = text);
+        };
+
+        _hudManager.TimerCompleted = (title, msg) =>
+        {
+            _trayController.Notify(title, msg);
+        };
+
+        _fullscreenDetector.FullscreenChanged += (isFs, mon) => _hudManager.SetFullscreenHidden(isFs, mon);
+
+        _launcherWindow = new LauncherWindow(
+            _log,
+            () => _config,
+            scene => _ = ExecuteScene(scene),
+            () => _ = RestoreScene(),
+            ToggleEditMode,
+            OpenSettings,
+            _onExit);
 
         _hotkeyService.HotkeyPressed += OnHotkeyPressed;
         _sceneManager.CurrentSceneChanged += OnCurrentSceneChanged;
@@ -204,19 +243,59 @@ public sealed class AppController : IDisposable
     {
         _isEditMode = !_isEditMode;
         _log.Info($"Edit mode toggled: {_isEditMode}");
+        _hudManager.SetEditMode(_isEditMode);
         _trayController.UpdateMenu(_config, _sceneManager.CurrentSceneId, _isEditMode);
     }
 
     public void OpenLauncher()
     {
         _log.Info("Launcher requested.");
-        // Will be wired to LauncherWindow in Phase 4
+        Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            _launcherWindow.Summon();
+        });
     }
 
     public void OpenSettings()
     {
         _log.Info("Settings requested.");
-        // Will be wired to SettingsWindow in Phase 4
+        Application.Current.Dispatcher.InvokeAsync(() =>
+        {
+            if (_settingsWindow != null && _settingsWindow.IsLoaded)
+            {
+                _settingsWindow.Activate();
+                return;
+            }
+
+            _settingsWindow = new SettingsWindow(
+                _log,
+                _config,
+                _configRepository.ConfigDirectory,
+                OnSaveSettings);
+
+            _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+            _settingsWindow.Show();
+        });
+    }
+
+    private void OnSaveSettings(AppConfig newConfig)
+    {
+        _config = newConfig;
+        _configRepository.Save(_config);
+
+        // Sync startup registration
+        StartupRegistration.SetRegistration(_config.GlobalSettings.RunAtStartup);
+
+        // Re-register hotkeys
+        RegisterAllHotkeys();
+
+        // Update tray menu
+        _trayController.UpdateMenu(_config, _sceneManager.CurrentSceneId, _isEditMode);
+
+        // Relayout HUD widgets
+        _hudManager.UpdateConfig(_config);
+
+        _log.Info("Settings updated and reloaded live.");
     }
 
     private void OnCurrentSceneChanged(string? sceneId)
@@ -232,6 +311,8 @@ public sealed class AppController : IDisposable
     {
         _hotkeyService.Dispose();
         _fullscreenDetector.Dispose();
+        _settingsWindow?.Close();
+        _launcherWindow.ForceClose();
         _hudManager.Dispose();
         _foregroundTracker.Dispose();
         _taskbarTracker.Dispose();

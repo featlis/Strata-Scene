@@ -1,8 +1,8 @@
-<local:HudWidgetBase x:Class="StrataScene.App.Hud.Widgets.CurrentModeWidget"
+<local:HudWidgetBase x:Class="StrataScene.App.Hud.Widgets.ScratchpadWidget"
               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:local="clr-namespace:StrataScene.App.Hud"
-              Width="110" Height="30"
+              Width="240" Height="30"
               SizeToContent="Manual">
     <Border x:Name="RootBorder"
             Background="#E61E1E1E"
@@ -21,26 +21,42 @@
                 </Style.Triggers>
             </Style>
         </Border.Style>
-        <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Margin="8,0">
+        <Grid VerticalAlignment="Center" Margin="10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="6" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Ellipse x:Name="ModeIndicator"
-                     Grid.Column="0"
-                     Width="8" Height="8"
-                     Fill="#0078D4"
-                     VerticalAlignment="Center" />
-            <TextBlock x:Name="ModeNameText"
-                       Grid.Column="2"
-                       Text="Work"
-                       Foreground="#FFFFFF"
+
+            <!-- Memo Icon -->
+            <TextBlock Grid.Column="0"
+                       Text="📝"
                        FontSize="11"
-                       FontWeight="SemiBold"
+                       VerticalAlignment="Center" />
+
+            <!-- Display TextBlock -->
+            <TextBlock x:Name="DisplayText"
+                       Grid.Column="2"
+                       Text="メモを入力..."
+                       Foreground="#AAAAAA"
+                       FontSize="11"
                        FontFamily="Segoe UI Variable, Segoe UI, sans-serif"
                        VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis" />
+                       TextTrimming="CharacterEllipsis"
+                       Visibility="Visible" />
+
+            <!-- Edit TextBox -->
+            <TextBox x:Name="EditTextBox"
+                     Grid.Column="2"
+                     Background="Transparent"
+                     Foreground="#FFFFFF"
+                     BorderThickness="0"
+                     FontSize="11"
+                     FontFamily="Segoe UI Variable, Segoe UI, sans-serif"
+                     VerticalAlignment="Center"
+                     Visibility="Collapsed"
+                     PreviewKeyDown="OnEditTextBoxPreviewKeyDown"
+                     LostFocus="OnEditTextBoxLostFocus" />
         </Grid>
     </Border>
 </local:HudWidgetBase>

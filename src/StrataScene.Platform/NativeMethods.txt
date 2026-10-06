@@ -29,3 +29,5 @@ IsWindowVisible
 GetWindow
 EnumDisplayMonitors
 GetClassName
+GetCursorPos
+MonitorFromPoint

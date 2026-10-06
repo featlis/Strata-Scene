@@ -1,0 +1,397 @@
+<Window x:Class="StrataScene.App.Settings.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:settings="clr-namespace:StrataScene.App.Settings"
+        Title="Strata Scene 設定"
+        Width="760" Height="580"
+        MinWidth="700" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        Background="#18181C"
+        Foreground="#FFFFFF"
+        FontFamily="Segoe UI Variable, Segoe UI, sans-serif">
+    <Window.Resources>
+        <Style x:Key="SectionTitleStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Foreground" Value="#BBBBC8" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#25252D" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#3D3D4A" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <Style x:Key="ModernComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="#25252D" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#3D3D4A" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+        </Style>
+
+        <Style x:Key="ModernCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#202026" />
+            <Setter Property="BorderBrush" Value="#32323D" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Main Tabs -->
+        <TabControl Grid.Row="0"
+                    Background="Transparent"
+                    BorderThickness="0">
+            <TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Foreground" Value="#9999AA" />
+                    <Setter Property="FontSize" Value="13" />
+                    <Setter Property="Padding" Value="16,8" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Border x:Name="TabBorder"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
+                                        BorderThickness="0,0,0,2"
+                                        Margin="0,0,8,4"
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter ContentSource="Header" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="TabBorder" Property="BorderBrush" Value="#0078D4" />
+                                        <Setter Property="Foreground" Value="#FFFFFF" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>
+
+            <!-- 1. 一般 (General) -->
+            <TabItem Header="一般">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
+                    <StackPanel>
+                        <!-- Startup & Launch Card -->
+                        <Border Style="{StaticResource ModernCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="起動設定" Style="{StaticResource SectionTitleStyle}" />
+                                <CheckBox x:Name="RunAtStartupCheckBox"
+                                          Content="Windows 起動時に Strata Scene を自動実行する"
+                                          Foreground="#FFFFFF"
+                                          Margin="0,0,0,12" />
+
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="ランチャー表示モニター:" Style="{StaticResource FieldLabelStyle}" />
+                                    <ComboBox x:Name="LauncherMonitorComboBox" Grid.Column="1" Style="{StaticResource ModernComboBoxStyle}">
+                                        <ComboBoxItem Content="マウスカーソル位置 (Cursor)" Tag="Cursor" />
+                                        <ComboBoxItem Content="プライマリモニター (Primary)" Tag="Primary" />
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Global Hotkeys Card -->
+                        <Border Style="{StaticResource ModernCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="全体ショートカット" Style="{StaticResource SectionTitleStyle}" />
+                                
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="ランチャー呼び出し:" Style="{StaticResource FieldLabelStyle}" />
+                                    <settings:HotkeyCaptureBox x:Name="LauncherHotkeyBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="直前シーンの復元:" Style="{StaticResource FieldLabelStyle}" />
+                                    <settings:HotkeyCaptureBox x:Name="RestoreSceneHotkeyBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="180" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="ウィジェット配置編集:" Style="{StaticResource FieldLabelStyle}" />
+                                    <settings:HotkeyCaptureBox x:Name="EditWidgetsHotkeyBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Minimize Exclusions Card -->
+                        <Border Style="{StaticResource ModernCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="最小化除外プロセス" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock Text="シーン切り替え時の全体最小化対象から除外するプロセス名（1行に1プロセス）:"
+                                           Foreground="#888899" FontSize="11" Margin="0,0,0,8" />
+                                <TextBox x:Name="MinimizeExcludeTextBox"
+                                         Style="{StaticResource ModernTextBoxStyle}"
+                                         AcceptsReturn="True"
+                                         Height="75"
+                                         VerticalScrollBarVisibility="Auto" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 2. シーン (Scenes) -->
+            <TabItem Header="シーン">
+                <Grid Margin="0,12,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Scene List & Buttons -->
+                    <Border Grid.Column="0" Style="{StaticResource ModernCardStyle}" Margin="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ListBox x:Name="ScenesListBox"
+                                     Grid.Row="0"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     SelectionChanged="OnSceneSelectionChanged">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="4,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="8" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Ellipse Grid.Column="0" Width="8" Height="8" VerticalAlignment="Center">
+                                                <Ellipse.Fill>
+                                                    <SolidColorBrush Color="{Binding Color, FallbackValue='#0078D4'}" />
+                                                </Ellipse.Fill>
+                                            </Ellipse>
+                                            <TextBlock Grid.Column="2" Text="{Binding Name}" Foreground="#FFFFFF" FontWeight="SemiBold" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="追加" Width="55" Height="26" Margin="0,0,6,0" Click="OnAddSceneClick" />
+                                <Button Content="複製" Width="55" Height="26" Margin="0,0,6,0" Click="OnDuplicateSceneClick" />
+                                <Button Content="削除" Width="55" Height="26" Click="OnDeleteSceneClick" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Right: Selected Scene Details -->
+                    <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                        <StackPanel x:Name="SceneDetailPanel">
+                            <Border Style="{StaticResource ModernCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="シーン基本設定" Style="{StaticResource SectionTitleStyle}" />
+                                    
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="シーン名:" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBox x:Name="SceneNameTextBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" />
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="ショートカット:" Style="{StaticResource FieldLabelStyle}" />
+                                        <settings:HotkeyCaptureBox x:Name="SceneHotkeyBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" />
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="120" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="カラー (HEX):" Style="{StaticResource FieldLabelStyle}" />
+                                        <TextBox x:Name="SceneColorTextBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" />
+                                    </Grid>
+
+                                    <CheckBox x:Name="SceneMinimizeOthersCheckBox"
+                                              Content="切り替え時に他のウィンドウを最小化する"
+                                              Foreground="#FFFFFF"
+                                              Margin="0,4,0,4" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Launch Apps -->
+                            <Border Style="{StaticResource ModernCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="起動アプリ" Style="{StaticResource SectionTitleStyle}" />
+                                    <ListBox x:Name="LaunchAppsListBox"
+                                             MaxHeight="120"
+                                             Background="#25252D"
+                                             BorderBrush="#3D3D4A"
+                                             BorderThickness="1"
+                                             Margin="0,0,0,8" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="アプリ追加..." Height="26" Padding="10,0" Margin="0,0,6,0" Click="OnAddLaunchAppClick" />
+                                        <Button Content="削除" Height="26" Padding="10,0" Click="OnRemoveLaunchAppClick" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Active Widgets -->
+                            <Border Style="{StaticResource ModernCardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="表示ウィジェット" Style="{StaticResource SectionTitleStyle}" />
+                                    <CheckBox x:Name="WidgetModeActiveCheckBox" Content="現在のモード (widget_mode)" Foreground="#FFFFFF" Margin="0,2" />
+                                    <CheckBox x:Name="WidgetPomodoroActiveCheckBox" Content="集中タイマー (widget_pomodoro)" Foreground="#FFFFFF" Margin="0,2" />
+                                    <CheckBox x:Name="WidgetScratchpadActiveCheckBox" Content="スクラッチパッド (widget_scratchpad)" Foreground="#FFFFFF" Margin="0,2" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <!-- 3. ウィジェット (Widgets) -->
+            <TabItem Header="ウィジェット">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,12,0,0">
+                    <StackPanel>
+                        <!-- CurrentMode Widget -->
+                        <Border Style="{StaticResource ModernCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="現在のモード表示 (CurrentMode)" Style="{StaticResource SectionTitleStyle}" />
+                                <CheckBox x:Name="CurrentModeEnabledCheckBox" Content="有効にする" Foreground="#FFFFFF" Margin="0,0,0,8" />
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="配置位置:" Style="{StaticResource FieldLabelStyle}" />
+                                    <ComboBox x:Name="CurrentModeDockComboBox" Grid.Column="1" Style="{StaticResource ModernComboBoxStyle}">
+                                        <ComboBoxItem Content="タスクバー右 (TaskbarRight)" Tag="TaskbarRight" />
+                                        <ComboBoxItem Content="タスクバー中央 (TaskbarCenter)" Tag="TaskbarCenter" />
+                                        <ComboBoxItem Content="タスクバー左 (TaskbarLeft)" Tag="TaskbarLeft" />
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- FocusTimer Widget -->
+                        <Border Style="{StaticResource ModernCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="集中タイマー (FocusTimer / Pomodoro)" Style="{StaticResource SectionTitleStyle}" />
+                                <CheckBox x:Name="FocusTimerEnabledCheckBox" Content="有効にする" Foreground="#FFFFFF" Margin="0,0,0,8" />
+                                
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="作業時間 (分):" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBox x:Name="FocusTimerWorkMinutesBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Width="80" HorizontalAlignment="Left" />
+                                </Grid>
+
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="休憩時間 (分):" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBox x:Name="FocusTimerBreakMinutesBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Width="80" HorizontalAlignment="Left" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Scratchpad Widget -->
+                        <Border Style="{StaticResource ModernCardStyle}">
+                            <StackPanel>
+                                <TextBlock Text="スクラッチパッド (Scratchpad)" Style="{StaticResource SectionTitleStyle}" />
+                                <CheckBox x:Name="ScratchpadEnabledCheckBox" Content="有効にする" Foreground="#FFFFFF" Margin="0,0,0,8" />
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="横幅 (DIP):" Style="{StaticResource FieldLabelStyle}" />
+                                    <TextBox x:Name="ScratchpadWidthBox" Grid.Column="1" Style="{StaticResource ModernTextBoxStyle}" Width="80" HorizontalAlignment="Left" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 4. 情報 (About) -->
+            <TabItem Header="情報">
+                <Border Style="{StaticResource ModernCardStyle}" Margin="0,12,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Strata Scene v0.1.0" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,4" />
+                        <TextBlock Text="Windows 11 特化 タスクバー統合型ワークスペース・シーンスイッチャー" Foreground="#00BCF9" FontSize="12" Margin="0,0,0,16" />
+
+                        <TextBlock Text="環境・テクノロジー:" FontWeight="SemiBold" Foreground="#FFFFFF" Margin="0,0,0,6" />
+                        <TextBlock Text="• ランタイム: .NET 10 LTS (net10.0-windows)" Foreground="#BBBBC8" FontSize="12" Margin="8,0,0,4" />
+                        <TextBlock Text="• UI フレームワーク: WPF (Windows Presentation Foundation) with Modern Fluent Styling" Foreground="#BBBBC8" FontSize="12" Margin="8,0,0,4" />
+                        <TextBlock Text="• Windows Interop: Microsoft.Windows.CsWin32 (Win32 Native API 直接連携)" Foreground="#BBBBC8" FontSize="12" Margin="8,0,0,16" />
+
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="設定フォルダを開く" Padding="12,6" Margin="0,0,8,0" Click="OnOpenConfigFolderClick" />
+                            <Button Content="ログフォルダを開く" Padding="12,6" Click="OnOpenLogFolderClick" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+        <!-- Bottom Action Bar -->
+        <Border Grid.Row="1" Margin="0,12,0,0" Padding="0,10,0,0" BorderBrush="#2D2D38" BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="保存して適用"
+                        Width="120" Height="32"
+                        Background="#0078D4" Foreground="#FFFFFF"
+                        FontWeight="SemiBold"
+                        Margin="0,0,10,0"
+                        Click="OnSaveAndApplyClick" />
+                <Button Content="キャンセル"
+                        Width="90" Height="32"
+                        Background="#33333F" Foreground="#FFFFFF"
+                        Click="OnCancelClick" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

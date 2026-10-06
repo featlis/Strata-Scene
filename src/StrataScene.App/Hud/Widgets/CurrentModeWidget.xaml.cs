@@ -1,10 +1,13 @@
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 
 namespace StrataScene.App.Hud.Widgets;
 
-public partial class CurrentModeWidget : NoActivateWindow
+public partial class CurrentModeWidget : HudWidgetBase
 {
+    public override string WidgetId => "widget_mode";
+
     public Action? OnClicked { get; set; }
 
     public CurrentModeWidget()
@@ -44,8 +47,28 @@ public partial class CurrentModeWidget : NoActivateWindow
         });
     }
 
+    protected override void UpdateEditVisuals(bool isEditMode)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (isEditMode)
+            {
+                RootBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(255, 185, 0)); // Gold accent
+                RootBorder.BorderThickness = new Thickness(1.5);
+                RootBorder.Cursor = Cursors.SizeAll;
+            }
+            else
+            {
+                RootBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(64, 255, 255, 255));
+                RootBorder.BorderThickness = new Thickness(1);
+                RootBorder.Cursor = Cursors.Hand;
+            }
+        });
+    }
+
     private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        if (IsEditMode) return;
         OnClicked?.Invoke();
     }
 }
