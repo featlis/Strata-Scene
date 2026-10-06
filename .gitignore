@@ -16,3 +16,5 @@ _ReSharper*/
 artifacts/
 TestResults/
 *.DotSettings
+publish/
+dist/

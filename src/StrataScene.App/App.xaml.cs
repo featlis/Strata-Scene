@@ -49,6 +49,26 @@ public partial class App : Application
 
         _controller = new AppController(_log, ExitApplication);
         _log.Info("Strata Scene initialized successfully.");
+
+        // Post-startup memory trim to reduce idle working set
+        Task.Delay(3000).ContinueWith(_ => TrimMemory());
+    }
+
+    private static void TrimMemory()
+    {
+        try
+        {
+            GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+            GC.WaitForPendingFinalizers();
+            GC.Collect(2, GCCollectionMode.Aggressive, true, true);
+
+            var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+            currentProcess.MinWorkingSet = currentProcess.MinWorkingSet;
+        }
+        catch
+        {
+            // Ignore
+        }
     }
 
     private void SetupSingleInstanceWakeUp()
